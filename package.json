@@ -6,6 +6,8 @@
     "dev:web3": "ts-node scripts/01-web.ts",
     "deploy:alpha": "npx hardhat run scripts/deploy.ts --network moonbaseAlpha",
     "deploy:alpha:token": "npx hardhat run scripts/deployToken.ts --network moonbaseAlpha",
+    "deploy:alpha:dao": "npx hardhat run scripts/05-delegationDao.ts --network moonbaseAlpha",
+    "verify": "npx hardhat verify --network moonbaseAlpha 0x0fbae8751A547Feb1e6A4B47C77b00da6d670219 '0x4209CA6C63c1624Ec86A1A6221618f8FCD1FCA84' '0x5A65b0B75C3AfCF9F4c911f6c2Fc96e80486C3CE'",
     "pricefeed": "npx hardhat run scripts/04-pricefeed.ts --network moonbaseAlpha",
     "test": "npx hardhat test",
     "lint:sol": "solhint contracts/*.sol",

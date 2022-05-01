@@ -120,6 +120,7 @@ contract DelegationDAO is AccessControl {
                     staking.candidate_delegation_count(target),
                     staking.delegator_delegation_count(address(this))
                 );
+                currentState = DaoState.STAKING;
             }
         } else {
             revert("The DAO is not accepting");
