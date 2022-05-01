@@ -2,6 +2,10 @@
   "name": "try-moonbeam",
   "version": "1.0.0",
   "main": "index.js",
+  "scripts": {
+    "deploy:alpha": "npx hardhat run scripts/deploy.ts --network moonbaseAlpha",
+    "test": "npx hardhat test"
+  },
   "license": "MIT",
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.0",
