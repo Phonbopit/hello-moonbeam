@@ -6,6 +6,7 @@
     "dev:web3": "ts-node scripts/01-web.ts",
     "deploy:alpha": "npx hardhat run scripts/deploy.ts --network moonbaseAlpha",
     "deploy:alpha:token": "npx hardhat run scripts/deployToken.ts --network moonbaseAlpha",
+    "pricefeed": "npx hardhat run scripts/04-pricefeed.ts --network moonbaseAlpha",
     "test": "npx hardhat test"
   },
   "license": "MIT",
