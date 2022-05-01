@@ -8,7 +8,8 @@
     "deploy:alpha:token": "npx hardhat run scripts/deployToken.ts --network moonbaseAlpha",
     "pricefeed": "npx hardhat run scripts/04-pricefeed.ts --network moonbaseAlpha",
     "test": "npx hardhat test",
-    "lint:sol": "solhint contracts/*.sol"
+    "lint:sol": "solhint contracts/*.sol",
+    "compile": "npx hardhat compile"
   },
   "license": "MIT",
   "devDependencies": {

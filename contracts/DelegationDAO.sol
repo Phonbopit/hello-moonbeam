@@ -109,4 +109,47 @@ contract DelegationDAO is AccessControl {
             revert("The DAO is not accepting");
         }
     }
+
+    function scheduleRevoke() public onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(currentState == DaoState.STAKING, "The DAO is not in the current state to revoke");
+
+        staking.schedule_revoke_delegation(target);
+        currentState = DaoState.REVOKING;
+    }
+
+    function executeRevoke() internal onlyRole(MEMBER) returns (bool) {
+        require(currentState == DaoState.REVOKING, "The DAO is not in the current state to execute");
+
+        staking.execute_delegation_request(address(this), target);
+        if (staking.is_delegator(address(this))) {
+            return false;
+        } else {
+            currentState = DaoState.REVOKED;
+            return true;
+        }
+    }
+
+    function withdraw(address payable account) public onlyRole(MEMBER) {
+        require(currentState != DaoState.STAKING, "The DAO is not is the correct state to withdraw");
+
+        if (currentState == DaoState.REVOKING) {
+            bool result = executeRevoke();
+            require(result, "Exit delay period has not finished yet");
+        }
+
+        if (currentState == DaoState.REVOKED || currentState == DaoState.COLLECTING) {
+            // Sanity checks
+            if (staking.is_delegator(address(this))) {
+                revert("The DAO is in an inconsistent state");
+            }
+            require(totalStake != 0, "Cannot divide by zero");
+
+            // Calculate the amount that the member is owned.
+            uint256 amount = address(this).balance.mul(memberStakes[msg.sender]).div(totalStake);
+            Address.sendValue(account, amount);
+
+            totalStake = totalStake.sub(memberStakes[msg.sender]);
+            memberStakes[msg.sender] = 0;
+        }
+    }
 }
