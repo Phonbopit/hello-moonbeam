@@ -3,17 +3,16 @@ import { ethers } from 'hardhat';
 
 describe('AhoyMoonNFT', () => {
   it('Should able to mint a NFT', async () => {
-    const Greeter = await ethers.getContractFactory('Greeter');
-    const greeter = await Greeter.deploy('Hello, world!');
-    await greeter.deployed();
+    const Contract = await ethers.getContractFactory('AhoyMoon');
+    const contract = await Contract.deploy();
+    await contract.deployed();
 
-    expect(await greeter.greet()).to.equal('Hello, world!');
+    const [_, wallet1] = await ethers.getSigners();
 
-    const setGreetingTx = await greeter.setGreeting('Hola, mundo!');
+    await contract.safeMint(wallet1.address);
 
-    // wait until the transaction is mined
-    await setGreetingTx.wait();
+    const ownerAddress = await contract.ownerOf(0); // tokenId = 0 is the first mint.
 
-    expect(await greeter.greet()).to.equal('Hola, mundo!');
+    expect(ownerAddress).to.equal(wallet1.address);
   });
 });
