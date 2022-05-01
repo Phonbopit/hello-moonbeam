@@ -28,10 +28,13 @@ const provider = new ethers.providers.StaticJsonRpcProvider(
 );
 
 const main = async () => {
+  const pair = 'ETH/USD';
+  const contract = contracts[pair];
+
   // with hre, we can use getContractAt
   const priceFeed = await ethers.getContractAt(
     'AggregatorV3Interface',
-    contracts['BTC/USD']
+    contract
   );
 
   // If not running with npx hardhat use this.
@@ -44,8 +47,10 @@ const main = async () => {
   const prices = await priceFeed.latestRoundData();
   const decimals = await priceFeed.decimals();
 
+  console.log(`${pair} have ${decimals} decimals`);
+
   const price = prices[1];
-  console.log(`Price : ${ethers.utils.formatUnits(price, decimals)}`);
+  console.log(`Price ${pair}: ${ethers.utils.formatUnits(price, decimals)}`);
 };
 
 main().catch((error) => {
