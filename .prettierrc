@@ -5,7 +5,8 @@
   "overrides": [{
     "files": "*.sol",
     "options": {
-      "singleQuote": false
+      "singleQuote": false,
+      "printWidth": 120
     }
   }]
 }
