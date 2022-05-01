@@ -18,7 +18,7 @@ contract DelegationDAO is AccessControl {
         REVOKED
     }
 
-    DaoState currentState;
+    DaoState public currentState;
 
     // keep track of the member stakes
     mapping(address => uint256) public memberStakes;
@@ -38,6 +38,12 @@ contract DelegationDAO is AccessControl {
 
     // The cololactor we want to delegate to
     address public target;
+
+    // Event for a member deposit
+    event Deposit(address indexed _from, uint256 _value);
+
+    // Event for a member withdrawal
+    event Withdrawal(address indexed _from, address indexed _to, uint256 _value);
 
     // Initialize a new DelegationDao dedicated to delegating to the given callactor target.
     constructor(address _target, address admin) {
@@ -74,12 +80,15 @@ contract DelegationDAO is AccessControl {
 
     // Change target,  admin only.
     function changeTarget(address newCollactor) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(
+            currentState == DaoState.REVOKED || currentState == DaoState.COLLECTING,
+            "The DAO is not in the correct state to changed."
+        );
         target = newCollactor;
     }
 
-    // Get the current state of the Dao
-    function getState() public view returns (DaoState) {
-        return currentState;
+    function resetDAO() public onlyRole(DEFAULT_ADMIN_ROLE) {
+        currentState = DaoState.COLLECTING;
     }
 
     function addStake() external payable onlyRole(MEMBER) {
@@ -90,10 +99,17 @@ contract DelegationDAO is AccessControl {
             }
             memberStakes[msg.sender] = memberStakes[msg.sender].add(msg.value);
             totalStake = totalStake.add(msg.value);
+
+            // emit event
+            emit Deposit(msg.sender, msg.value);
+
             staking.delegator_bond_more(target, msg.value);
         } else if (currentState == DaoState.COLLECTING) {
             memberStakes[msg.sender] = memberStakes[msg.sender].add(msg.value);
             totalStake = totalStake.add(msg.value);
+
+            // emit event
+            emit Deposit(msg.sender, msg.value);
 
             if (totalStake < MIN_STAKING) {
                 return;
@@ -146,10 +162,15 @@ contract DelegationDAO is AccessControl {
 
             // Calculate the amount that the member is owned.
             uint256 amount = address(this).balance.mul(memberStakes[msg.sender]).div(totalStake);
+
+            require(checkFreeBalance() >= amount, "Not enough free balance for withdraw");
+
             Address.sendValue(account, amount);
 
             totalStake = totalStake.sub(memberStakes[msg.sender]);
             memberStakes[msg.sender] = 0;
+
+            emit Withdrawal(msg.sender, account, amount);
         }
     }
 }
