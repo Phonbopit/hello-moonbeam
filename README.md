@@ -5,6 +5,23 @@ Genereated with Hardhat.
 
 ---
 
+## Scripts
+
+```
+ts-node scripts/<FILENAME>
+
+ts-node scripts/01-web3.ts
+ts-node scripts/03-ethers.ts
+```
+
+```
+yarn deploy:alpha
+yarn deploy:alpha:token
+yarn test
+```
+
+---
+
 **Moonbase Alpha**
 
 ```
